@@ -20,27 +20,28 @@ class cleaner:    # created initialization method in my cleaner class
             self.clean(environment)#there have two attributes "self.a" and "self.clean(), its takes argument "environment"
             # i used this one for moving one unit  to up
     def  move_down(self, environment):
-        if self.a > 1:
+        if self.a < len(environment):
             self.a +=1
             self.clean(environment)#there have two attributes "self.a" and "self.clean(), its takes argument "environment"
             # i used this one for moving one unit  to down 
     def clean(self,environment):
-        if environment[self.a-1][self.b-1] == "Dirt  ":
-            environment[self.a-1][self.b-1] = "Clean "
+        if environment[self.a-1][self.b-1] == "dirt  ":
+            environment[self.a-1][self.b-1] = "Clean " # change the current cell state to clean
             # i used this one for checking the cell if it is dirty , its clean the cell by updaing it's value to "clean"
     def get_environment_with_cleaner(self, environment):
         new_environment = [row.copy() for row in environment]
         new_environment[self.a-1][self.b-1] += "*"
         return new_environment
+    # i used this one for marked the current position of vaccum cleaner with(*)
 
-#///////////////////////////////////////////(       CLASS AUTOAGENT            )///////////////////////////////////////////////////#
+#///////////////////////////////////////////(       CLASS MANUAL AGENT            )///////////////////////////////////////////////////#
 class ManualAgent:
-    def get_action(self):
+    def get_action(self): 
         action = input("Enter action (left, right, up, down, clean): ")
         return action
     #method is get_action then returns the string by the user
 
-#///////////////////////////////////////////(       CLASS MANUALAGENT           )////////////////////////////////////////////////////#
+#///////////////////////////////////////////(       CLASS AUTOAGENT           )////////////////////////////////////////////////////#
 class AutoAgent:
     def get_action(self, environment, cleaner):
         if environment[cleaner.a-1][cleaner.b-1] == "dirt  ":
@@ -83,13 +84,14 @@ def get_coordinate_input(prompt):
     while True:
         try:
             value = input(prompt)
-            if value == 'Q':
+            if value == 'q':
                 return value
             a, b = map(int, value.split(","))
             if a > 0 and b > 0:
                 return a, b
         except ValueError:
             print("Sorry, invalid value. Enter a positive coordinates in the format a,b.")
+            # for a,b formet user need to put > 0 and for quit entering user can press"q" anytime 
 #/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
         
 def create_environment(n):
@@ -100,10 +102,12 @@ def create_environment(n):
             row.append("clean ")
         environment.append(row)
     return environment
+   # each "n" cells with string value "clean" .it's returns  the fully initialized environment.
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
 
-def mark_dirt(environment, a, b):
+def mark_dirt(environment, a, b): # mark cell at row a, column b as "dirt"
     environment[a-1][b-1] = "dirt  "
+     
 #\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\#
 
 def display_environment(environment):
@@ -112,22 +116,24 @@ def display_environment(environment):
     print("+{}+".format("--" * (n * 3 + n + 1)))
     # Print each row of the table
     for row in environment:
-        print("| {} |".format(" | ".join(row)))
-    # Print the bottom border of the table
-    print("+{}+".format("--" * (n * 3 + n + 1)))
+        for col in row:
+           
+         print("| {:^2}".format(col), end=" ") # it's centers value within a 2-character  wide space for each column 
+        print("|")
+        print("+{}+".format("--" * (n * 3 + n + 1)))
 #////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
 
 n = get_integer_input("Enter the size of the  environment: ")
-environment = create_environment(n)
-while True:
-    dirt_location = get_coordinate_input("Enter the location of the dirt (or type 'Q' to stop): ")
-    if dirt_location == "Q":
+environment = create_environment(n) # for create environment size from user
+while True: # this loop for get dirt location untill user put q
+    dirt_location = get_coordinate_input("Enter the location of the dirt (use a,b int formet or type 'q' to stop): ")
+    if dirt_location == "q": # if user put "q" it's break the loop
         break
-    mark_dirt(environment, dirt_location[0], dirt_location[1])
+    mark_dirt(environment, dirt_location[0], dirt_location[1]) # it's used for marking the dirt
 #/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
 
-display_environment(environment)
-agent_type = input("Enter agent type (manual or auto): ")
+display_environment(environment) # it's showed current state of environment
+agent_type = input("Enter agent type (manual or auto): ") # user need to select manual or auto
 if agent_type == "manual":
  agent = ManualAgent()
 elif agent_type == "auto":
@@ -135,40 +141,41 @@ elif agent_type == "auto":
 else:
     print("Invalid input. Please enter 'manual' or 'auto'.")
     exit()
+    # for invalid input i used this one
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
 
-start_location = get_coordinate_input("Enter start location of the cleaner: ")
-cleaner = cleaner(start_location[0], start_location[1])
+start_location = get_coordinate_input("Enter start location of the cleaner: ") # this one for start location of cleaner user need to select 
+Cleaner = cleaner(start_location[0], start_location[1])
 
-while not is_goal_state(environment):
-    display_environment(cleaner.get_environment_with_cleaner(environment))
-    if isinstance(agent, ManualAgent):
+while not is_goal_state(environment): # loop for  goal state reched
+    display_environment(Cleaner.get_environment_with_cleaner(environment)) # displays the current state of the environmennt with cleaner position
+    if isinstance(agent, ManualAgent):     #user need slect movement untill goals state reached for manual
         action = agent.get_action()
-    elif isinstance(agent, AutoAgent):
-        action = agent.get_action(environment, cleaner)
+    elif isinstance(agent, AutoAgent): # it will take autp action .
+        action = agent.get_action(environment, Cleaner)
     else:
         print("Invalid agent type.")
         exit()
     if action == "left":
-        cleaner.move_left(environment)
+        Cleaner.move_left(environment)
         print("Cleaner moved left.")
     elif action == "right":
-        cleaner.move_right(environment)
+        Cleaner.move_right(environment)
         print("Cleaner moved right.")
     elif action == "up":
-        cleaner.move_up(environment)
+        Cleaner.move_up(environment)
         print("Cleaner moved up.")
     elif action == "down":
-        cleaner.move_down(environment)
+        Cleaner.move_down(environment)
         print("Cleaner moved down.")
-        cleaner.move_left(environment)
+        Cleaner.move_left(environment)
     elif action == "clean":
-        cleaner.clean(environment)
+        Cleaner.clean(environment)
         print("Clean")
-        
+   
     else:
         print("Invalid action. Try again.")
 
 
-print(" All task is clean !")
+print(" all task is clean !")
 display_environment(environment)
