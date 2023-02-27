@@ -179,3 +179,4 @@ while not is_goal_state(environment): # loop for  goal state reched
 
 print(" all task is clean !")
 display_environment(environment)
+#////////////////////////////////////////////// (          END       )//////////////////////////////////////////////////////////////////////////#
